@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">MapMarkers</string>
+    <string name="description_menu">Menu</string>
+    <string name="description_select_photo">Select photo</string>
+    <string name="description_take_photo">Take photo</string>
+    <string name="description_photo">Photo</string>
+    <string name="description_pick_photo">Pick image</string>
+    <string name="description_post_attachment">Attachment</string>
+    <string name="description_image_full_screen">Full screen</string>
+    <string name="description_share">Share</string>
+    <string name="menu_remove">Remove</string>
+    <string name="menu_edit">Edit</string>
+    <string name="add_point">Add point</string>
+    <string name="name">Point name</string>
+    <string name="content">Point content</string>
+    <string name="post_input_text_hint">Input text</string>
+    <string name="retry_loading">Retry</string>
+    <string name="empty_posts">There are no posts.\n If you create a new post, it will appear here</string>
+    <string name="error_loading">Something went wrong. Try again later</string>
+    <string name="save">Save</string>
+    <string name="new_points">New posts</string>
+    <string name="clear">Clear</string>
+    <string name="remove">Remove</string>
+
+
+</resources>
