@@ -2,7 +2,6 @@ package ru.netology.mapmarkers.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import ru.netology.mapmarkers.dto.AttachmentType
 import ru.netology.mapmarkers.dto.PointEntity
 
 @Dao
@@ -31,11 +30,4 @@ interface PointDao {
                 it)
         }
     }
-}
-class Converters {
-    @TypeConverter
-    fun toAttachmentType(value: String) = enumValueOf<AttachmentType>(value)
-
-    @TypeConverter
-    fun fromAttachmentType(value: AttachmentType) = value.name
 }
