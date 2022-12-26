@@ -16,8 +16,9 @@ import ru.netology.mapmarkers.adapter.OnInteractionListener
 import ru.netology.mapmarkers.adapter.PointsAdapter
 import ru.netology.mapmarkers.databinding.FragmentCardPointBinding
 import ru.netology.mapmarkers.dto.PlacePoint
-import ru.netology.mapmarkers.ui.FeedFragment.Companion.idArg
 import ru.netology.mapmarkers.viewModel.MapsViewModel
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 
 class CardPointFragment : Fragment() {
@@ -47,7 +48,7 @@ class CardPointFragment : Fragment() {
                     )
                 }
 
-                override suspend fun onRemoveListener(place: PlacePoint) {
+                override fun onRemoveListener(place: PlacePoint) {
                     viewModel.deletePlaceById(place.id)
                 }
 
@@ -68,4 +69,18 @@ class CardPointFragment : Fragment() {
 
             return binding.root
         }
+
+companion object {
+    var Bundle.idArg: Int by IntArg
+}
+
+object IntArg : ReadWriteProperty<Bundle, Int> {
+    override fun getValue(thisRef: Bundle, property: KProperty<*>): Int {
+        return thisRef.getInt(property.name)
+    }
+
+    override fun setValue(thisRef: Bundle, property: KProperty<*>, value: Int) {
+        thisRef.putInt(property.name, value)
+    }
+}
 }
