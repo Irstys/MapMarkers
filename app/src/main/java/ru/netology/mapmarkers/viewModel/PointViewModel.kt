@@ -4,22 +4,19 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import ru.netology.mapmarkers.db.AppDb
-import ru.netology.mapmarkers.dto.Point
+import ru.netology.mapmarkers.dto.PlacePoint
 import ru.netology.mapmarkers.model.FeedModelState
 import ru.netology.mapmarkers.repository.PointRepository
 import ru.netology.mapmarkers.repository.PointRepositoryImpl
 import ru.netology.mapmarkers.util.SingleLiveEvent
 
-private val empty = Point(
+private val empty = PlacePoint(
     id = 0,
     content = "",
     name = "",
-    longitude = 0F,
-    latitude = 0F,
-    viewed = false,
+    latitude = 0.0,
+    longitude = 0.0,
 )
 
 class PointViewModel(application: Application) : AndroidViewModel(application){
@@ -31,14 +28,14 @@ class PointViewModel(application: Application) : AndroidViewModel(application){
     val dataState: LiveData<FeedModelState>
         get() = _dataState
 
-    val edited: MutableLiveData<Point> = MutableLiveData(empty)
+    val edited: MutableLiveData<PlacePoint> = MutableLiveData(empty)
     private val _pointCreated = SingleLiveEvent<Unit>()
     val pointCreated: LiveData<Unit>
         get() = _pointCreated
 
     fun removeById(id: Long) = repository.removeById(id)
 
-    fun edit(point: Point) {
+    fun edit(point: PlacePoint) {
         edited.value = point
     }
     fun changeContent(content: String) {

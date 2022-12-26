@@ -18,13 +18,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStart"
-            android:layout_marginEnd="@dimen/marginEnd"
             android:ellipsize="end"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/menu"
             tools:ignore="SelectableText"
             tools:text="Name" />
 
+        <ImageView
+            android:id="@+id/menu_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:contentDescription="@string/description_menu"
+            app:layout_constraintTop_toBottomOf="@+id/name"
+            app:srcCompat="@drawable/ic_point_24"
+            tools:layout_editor_absoluteX="@dimen/marginStart"
+            tools:ignore="MissingConstraints" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/menu"

@@ -48,27 +48,9 @@
         style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/pickPhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:contentDescription="@string/description_pick_photo"
-            android:padding="@dimen/commonSpacingMedium"
-            android:src="@drawable/ic_attach_file_48" />
-
-
-        <ImageView
-            android:id="@+id/takePhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:contentDescription="@string/description_take_photo"
-            android:padding="@dimen/commonSpacingMedium"
-            android:src="@drawable/ic_baseline_photo_camera_48" />
-
-    </LinearLayout>
+   </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

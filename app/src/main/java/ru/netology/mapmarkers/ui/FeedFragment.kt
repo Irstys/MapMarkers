@@ -14,8 +14,7 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 import androidx.navigation.fragment.findNavController
 import ru.netology.mapmarkers.R
-import ru.netology.mapmarkers.dto.Point
-import ru.netology.mapmarkers.ui.CardPointFragment.Companion.textArg
+import ru.netology.mapmarkers.dto.PlacePoint
 
 class FeedFragment : Fragment() {
     internal val viewModel: PointViewModel by viewModels(ownerProducer = ::requireParentFragment)
@@ -35,21 +34,21 @@ override fun onCreateView(
     )
     val adapter = PointsAdapter(object : OnInteractionListener {
 
-        override fun onRemoveListener(point: Point) {
+        override suspend fun onRemoveListener(point: PlacePoint) {
             viewModel.removeById(point.id)
         }
 
-        override fun onEditListener(point: Point) {
+        override fun onEditListener(point: PlacePoint) {
             viewModel.edit(point)
             findNavController().navigate(
                 R.id.action_feedFragment_to_editPointFragment,
                 Bundle().apply {
-                    textArg = point.content
+
                 }
             )
         }
 
-        override fun onPoint(point: Point) {
+        override fun onClickPoint(point: PlacePoint) {
             findNavController().navigate(
                 R.id.action_feedFragment_to_cardPointFragment,
                 Bundle().apply {
@@ -59,12 +58,7 @@ override fun onCreateView(
         }
     })
     binding.list.adapter = adapter
-    viewModel.data.observe(viewLifecycleOwner) { posts ->
-        val newPost = adapter.itemCount < posts.size
-        adapter.submitList(posts) {
-            if (newPost) binding.list.smoothScrollToPosition(0)
-        }
-    }
+
     binding.retryButton.setOnClickListener {
         viewModel.loadPoints()
     }

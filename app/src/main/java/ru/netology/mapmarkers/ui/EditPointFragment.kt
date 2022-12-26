@@ -50,8 +50,10 @@ class EditPointFragment: Fragment() {
                 when (menuItem.itemId) {
                     R.id.save -> {
                         fragmentBinding?.let {
-                            viewModel.changeContent(it.edit.text.toString())
-                            viewModel.save()
+                            viewModel.run {
+                                changeContent(it.edit.text.toString())
+                                this.save()
+                            }
                             AndroidUtils.hideKeyboard(requireView())
                         }
                         true

@@ -4,37 +4,31 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "points")
-data class PointEntity(
+data class PlacePointEntity(
         @PrimaryKey(autoGenerate = true)
-        val id: Long,
+        val id: Long = 0,
         val name: String,
-        val longitude: Float,
-        val latitude: Float,
+        val latitude: Double,
+        val longitude: Double,
         val content: String? = null,
-        val viewed: Boolean = false,
-     //   val attachment: Attachment? = null,
-    ){
-    fun toDto() = Point(
+    ) {
+    fun toDto() = PlacePoint(
         id,
         name,
-        longitude,
         latitude,
+        longitude,
         content,
-        viewed,
-      //  attachment
-        )
+    )
 
 
     companion object {
-        fun fromDto(dto: Point) =
-            PointEntity(
+        fun fromDto(dto: PlacePoint) =
+            PlacePointEntity(
                 dto.id,
                 dto.name,
-                dto.longitude,
                 dto.latitude,
+                dto.longitude,
                 dto.content,
-                dto.viewed,
-             //   dto.attachment
             )
     }
 }

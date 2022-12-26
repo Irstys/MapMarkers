@@ -1,173 +1,222 @@
 package ru.netology.mapmarkers.ui
 
-import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.content.Context
-import android.content.pm.PackageManager.PERMISSION_GRANTED
-import android.graphics.Color.BLUE
-import android.graphics.PointF
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.core.content.ContextCompat.checkSelfPermission
-import androidx.fragment.*
+import android.view.*
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.coroutineScope
 import com.yandex.mapkit.Animation
-import com.yandex.mapkit.Animation.Type.SMOOTH
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.layers.ObjectEvent
-import com.yandex.mapkit.map.*
-import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.user_location.UserLocationLayer
 import com.yandex.mapkit.user_location.UserLocationObjectListener
 import com.yandex.mapkit.user_location.UserLocationView
-import com.yandex.runtime.image.ImageProvider.fromResource
+import com.yandex.runtime.ui_view.ViewProvider
+import kotlinx.coroutines.flow.collectLatest
 import ru.netology.mapmarkers.R
+import ru.netology.mapmarkers.databinding.FragmentMapsBinding
+import ru.netology.mapmarkers.databinding.PlacePointBinding
+import ru.netology.mapmarkers.viewModel.MapsViewModel
+import androidx.navigation.fragment.findNavController
 
-private val MAPKIT_API_KEY = "0071cd7a-8aca-4d08-b24a-e962e2416234"
-private val requestPermissionLocation = 1
 
-class MapsFragment  : Fragment(), UserLocationObjectListener, CameraListener {
-    private var mapView: MapView? = null
-    private lateinit var userLocationLayer: UserLocationLayer
-    private var permissionLocation = false
-    private var followUserLocation = false
-    private var routeStartLocation = Point(0.0, 0.0)
-    private var ctx: Context? = null
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        ctx = context
+class MapsFragment  : Fragment() {
+    companion object {
+        const val LAT_KEY = "LAT_KEY"
+        const val LONG_KEY = "LONG_KEY"
     }
+    private var mapView: MapView? = null
+    private lateinit var userLocation: UserLocationLayer
+
+    private val listener = object : InputListener {
+        override fun onMapTap(map: Map, point: Point) = Unit
+
+        override fun onMapLongTap(map: Map, point: Point) {
+            EditPointDialog.newInstance(point.latitude, point.longitude)
+                .show(childFragmentManager, null)
+        }
+
+    }
+    private val locationObjectListener = object : UserLocationObjectListener {
+        override fun onObjectAdded(view: UserLocationView) = Unit
+
+        override fun onObjectRemoved(view: UserLocationView) = Unit
+
+        override fun onObjectUpdated(view: UserLocationView, event: ObjectEvent) {
+            userLocation.cameraPosition()?.target?.let {
+                mapView?.map?.move(CameraPosition(it, 10F, 0F, 0F))
+            }
+            userLocation.setObjectListener(null)
+        }
+    }
+    private val viewModel by viewModels<MapsViewModel>()
+
+    private val placeTapListener = MapObjectTapListener { mapObject, _ ->
+        viewModel.deletePlaceById(mapObject.userData as Long)
+        true
+    }
+    private val permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            when {
+                granted -> {
+                    userLocation.isVisible = true
+                    userLocation.isHeadingEnabled = false
+                    userLocation.cameraPosition()?.target?.also {
+                        val map = mapView?.map ?: return@registerForActivityResult
+                        val cameraPosition = map.cameraPosition
+                        map.move(
+                            CameraPosition(
+                                it,
+                                cameraPosition.zoom,
+                                cameraPosition.azimuth,
+                                cameraPosition.tilt,
+                            )
+                        )
+                    }
+                }
+                else -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.need_permission),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MapKitFactory.initialize(this.context)
-        MapKitFactory.setApiKey(MAPKIT_API_KEY) // Установить  ключ API
-        this.context?.let { checkPermission(it) }
+        MapKitFactory.initialize(requireContext())
     }
-    private fun checkPermission(context: Context) {
-        val permissionLocation = checkSelfPermission(context, ACCESS_FINE_LOCATION)
-        if (permissionLocation != PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(ACCESS_FINE_LOCATION), requestPermissionLocation)
-        } else {
-            onMapReady()
-        }
-    }
-
-    private fun onMapReady() {
-        val mapKit = MapKitFactory.getInstance()
-        userLocationLayer = mapKit.createUserLocationLayer(mapView?.mapWindow!!)
-        userLocationLayer.isVisible = true
-        userLocationLayer.isHeadingEnabled = true
-        userLocationLayer.setObjectListener(this)
-
-        mapView?.map?.addCameraListener(this)
-
-        cameraUserPosition()
-
-        permissionLocation = true
-    }
-    private fun cameraUserPosition() {
-        if (userLocationLayer.cameraPosition() != null) {
-            routeStartLocation = userLocationLayer.cameraPosition()!!.target
-            mapView?.map?.move(
-                CameraPosition(routeStartLocation, 16f, 0f, 0f), Animation(SMOOTH, 1f), null
-            )
-        } else {
-            mapView?.map?.move(CameraPosition(Point(0.0, 0.0), 16f, 0f, 0f))
-        }
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults: IntArray,
-    ) {
-        when (requestCode) {
-            requestPermissionLocation -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PERMISSION_GRANTED) {
-                    onMapReady()
-                }
-
-                return
-            }
-        }
-    }
-
-    override fun onObjectAdded(userLocationView: UserLocationView) {
-        setAnchor()
-        userLocationView.pin.setIcon(fromResource(ctx, R.drawable.ic_user_24))
-        userLocationView.arrow.setIcon(fromResource(ctx, R.drawable.ic_user_24))
-        userLocationView.accuracyCircle.fillColor = BLUE
-    }
-
-    override fun onObjectRemoved(p0: UserLocationView) {
-            }
-
-    override fun onObjectUpdated(p0: UserLocationView, p1: ObjectEvent) {
-    }
-
-    override fun onCameraPositionChanged(
-        p0: Map,
-        p1: CameraPosition,
-        p2: CameraUpdateReason,
-        p3: Boolean,
-    ) {
-        if (p3) {
-            if (followUserLocation) {
-                setAnchor()
-            }
-        } else {
-            if (!followUserLocation) {
-                noAnchor()
-            }
-        }
-    }
-
-    private fun setAnchor() {
-        userLocationLayer.setAnchor(
-            PointF((mapView!!.width * 0.5).toFloat(), (mapView!!.height * 0.5).toFloat()),
-            PointF((mapView!!.width * 0.5).toFloat(), (mapView!!.height * 0.83).toFloat())
-        )
-
-        //user_location_fab.setImageResource(R.drawable.ic_my_location_black_24dp)
-
-        followUserLocation = false
-    }
-
-    private fun noAnchor() {
-        userLocationLayer.resetAnchor()
-
-       // user_location_fab.setImageResource(R.drawable.ic_location_searching_black_24dp)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
-        return  inflater.inflate(R.layout.fragment_maps, container, false)
-    }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        mapView = view.findViewById<View>(R.id.maps) as MapView
-    }
+        val binding = FragmentMapsBinding.inflate(inflater, container, false)
 
+        mapView = binding.map.apply {
+            userLocation = MapKitFactory.getInstance().createUserLocationLayer(mapWindow)
+            if (requireActivity()
+                    .checkSelfPermission(
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                userLocation.isVisible = true
+                userLocation.isHeadingEnabled = false
+            }
 
-    override fun onStop() {
-        mapView?.onStop()
-        MapKitFactory.getInstance().onStop()
-        super.onStop()
+            map.addInputListener(listener)
+
+            val collection = map.mapObjects.addCollection()
+            viewLifecycleOwner.lifecycle.coroutineScope.launchWhenStarted {
+                viewModel.places.collectLatest { places ->
+                    collection.clear()
+                    places.forEach { place ->
+                        val placeBinding = PlacePointBinding.inflate(layoutInflater)
+                        placeBinding.title.text = place.name
+                        collection.addPlacemark(
+                            Point(place.latitude, place.longitude),
+                            ViewProvider(placeBinding.root)
+                        ).apply {
+                            userData = place.id
+                        }
+                    }
+                }
+            }
+            collection.addTapListener(placeTapListener)
+
+            // Переход к точке на карте после клика на списке
+            val arguments = arguments
+            if (arguments != null &&
+                arguments.containsKey(LAT_KEY) &&
+                arguments.containsKey(LONG_KEY)
+            ) {
+                val cameraPosition = map.cameraPosition
+                map.move(
+                    CameraPosition(
+                        Point(arguments.getDouble(LAT_KEY), arguments.getDouble(LONG_KEY)),
+                        10F,
+                        cameraPosition.azimuth,
+                        cameraPosition.tilt,
+                    )
+                )
+                arguments.remove(LAT_KEY)
+                arguments.remove(LONG_KEY)
+            } else {
+                // При входе в приложение показываем текущее местоположение
+                userLocation.setObjectListener(locationObjectListener)
+            }
+        }
+
+        binding.plus.setOnClickListener {
+            binding.map.map.move(
+                CameraPosition(
+                    binding.map.map.cameraPosition.target,
+                    binding.map.map.cameraPosition.zoom + 1, 0.0f, 0.0f
+                ),
+                Animation(Animation.Type.SMOOTH, 1F),
+                null
+            )
+        }
+
+        binding.minus.setOnClickListener {
+            binding.map.map.move(
+                CameraPosition(
+                    binding.map.map.cameraPosition.target,
+                    binding.map.map.cameraPosition.zoom - 1, 0.0f, 0.0f
+                ),
+                Animation(Animation.Type.SMOOTH, 1F),
+                null,
+            )
+        }
+
+        binding.location.setOnClickListener {
+            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.map_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                if (menuItem.itemId == R.id.list) {
+                    findNavController().navigate(R.id.action_mapsFragment_to_feedFragment)
+                    true
+                } else {
+                    false
+                }
+
+        }, viewLifecycleOwner)
+
+        return binding.root
     }
 
     override fun onStart() {
         super.onStart()
-        MapKitFactory.getInstance().onStart()
         mapView?.onStart()
-        mapView?.map?.move(
-            CameraPosition(Point(55.751574, 37.573856), 11.0f, 0.0f, 0.0f),
-            Animation(Animation.Type.SMOOTH, 0F),
-            null)
-        mapView?.map?.isRotateGesturesEnabled = true
+        MapKitFactory.getInstance().onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView?.onStop()
+        MapKitFactory.getInstance().onStop()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mapView = null
     }
 }

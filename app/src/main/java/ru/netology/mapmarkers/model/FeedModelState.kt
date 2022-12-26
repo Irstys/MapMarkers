@@ -1,6 +1,6 @@
 package ru.netology.mapmarkers.model
 
-import ru.netology.mapmarkers.dto.Point
+import ru.netology.mapmarkers.dto.PlacePoint
 import ru.netology.mapmarkers.util.RetryTypes
 
 data class FeedModelState(
@@ -10,5 +10,5 @@ data class FeedModelState(
     //val messageOfCodeError: String = ""
     val retryId: Long = 0,
     val retryType: RetryTypes? = null,
-    val retryPost: Point? = null,
+    val retryPost: PlacePoint? = null,
 )

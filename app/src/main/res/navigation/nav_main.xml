@@ -12,6 +12,15 @@
         <action
             android:id="@+id/action_cardPointFragment_to_editPointFragment"
             app:destination="@id/editPointFragment" />
+        <action
+            android:id="@+id/action_cardPointFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_cardPointFragment_to_editPointDialog"
+            app:destination="@id/editPointDialog" />
+        <action
+            android:id="@+id/action_cardPointFragment_to_editPointDialog2"
+            app:destination="@id/editPointDialog" />
     </fragment>
     <fragment
         android:id="@+id/editPointFragment"
@@ -36,6 +45,9 @@
         <action
             android:id="@+id/action_feedFragment_to_mapsFragment"
             app:destination="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_feedFragment_to_editPointDialog"
+            app:destination="@id/editPointDialog" />
     </fragment>
     <fragment
         android:id="@+id/mapsFragment"
@@ -45,5 +57,12 @@
         <action
             android:id="@+id/action_mapsFragment_to_feedFragment"
             app:destination="@id/feedFragment" />
+        <action
+            android:id="@+id/action_mapsFragment_to_editPointDialog"
+            app:destination="@id/editPointDialog" />
     </fragment>
+    <dialog
+        android:id="@+id/editPointDialog"
+        android:name="ru.netology.mapmarkers.ui.EditPointDialog"
+        android:label="EditPointDialog" />
 </navigation>
