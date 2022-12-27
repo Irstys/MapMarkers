@@ -16,6 +16,7 @@
     <string name="post_input_text_hint">Input text</string>
     <string name="retry_loading">Retry</string>
     <string name="empty_point">Empty</string>
+    <string name="navigate">Navigate</string>
     <string name="error_loading">Something went wrong. Try again later</string>
     <string name="save">Save</string>
     <string name="new_points">New posts</string>

@@ -17,15 +17,11 @@ abstract class AppDb : RoomDatabase() {
 
         fun getInstance(context: Context): AppDb {
             return instance ?: synchronized(this) {
-                instance ?: buildDatabase(context).also { instance = it }
+                instance ?: Room.databaseBuilder(context, AppDb::class.java, "place_db")
+                    .build()
+                    .also { instance = it }
             }
         }
 
-        private fun buildDatabase(context: Context) = Room.databaseBuilder(
-            context, AppDb::class.java, "app.db"
-        )
-            .fallbackToDestructiveMigration()
-            .allowMainThreadQueries()
-            .build()
     }
 }

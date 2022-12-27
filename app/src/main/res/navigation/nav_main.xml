@@ -3,66 +3,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
-    app:startDestination="@id/feedFragment">
-    <fragment
-        android:id="@+id/cardPointFragment"
-        android:name="ru.netology.mapmarkers.ui.CardPointFragment"
-        android:label="fragment_card_point"
-        tools:layout="@layout/fragment_card_point" >
-        <action
-            android:id="@+id/action_cardPointFragment_to_editPointFragment"
-            app:destination="@id/editPointFragment" />
-        <action
-            android:id="@+id/action_cardPointFragment_to_mapsFragment"
-            app:destination="@id/mapsFragment" />
-        <action
-            android:id="@+id/action_cardPointFragment_to_editPointDialog"
-            app:destination="@id/editPointDialog" />
-        <action
-            android:id="@+id/action_cardPointFragment_to_editPointDialog2"
-            app:destination="@id/editPointDialog" />
-    </fragment>
-    <fragment
-        android:id="@+id/editPointFragment"
-        android:name="ru.netology.mapmarkers.ui.EditPointFragment"
-        android:label="fragment_edit_point"
-        tools:layout="@layout/fragment_edit_point" >
-        <action
-            android:id="@+id/action_editPointFragment_to_cardPointFragment"
-            app:destination="@id/cardPointFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/feedFragment"
-        android:name="ru.netology.mapmarkers.ui.FeedFragment"
-        android:label="fragment_feed"
-        tools:layout="@layout/fragment_feed" >
-        <action
-            android:id="@+id/action_feedFragment_to_editPointFragment"
-            app:destination="@id/editPointFragment" />
-        <action
-            android:id="@+id/action_feedFragment_to_cardPointFragment"
-            app:destination="@id/cardPointFragment" />
-        <action
-            android:id="@+id/action_feedFragment_to_mapsFragment"
-            app:destination="@id/mapsFragment" />
-        <action
-            android:id="@+id/action_feedFragment_to_editPointDialog"
-            app:destination="@id/editPointDialog" />
-    </fragment>
+    app:startDestination="@id/cardPointFragment">
     <fragment
         android:id="@+id/mapsFragment"
         android:name="ru.netology.mapmarkers.ui.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" >
         <action
-            android:id="@+id/action_mapsFragment_to_feedFragment"
-            app:destination="@id/feedFragment" />
-        <action
             android:id="@+id/action_mapsFragment_to_editPointDialog"
             app:destination="@id/editPointDialog" />
+        <action
+            android:id="@+id/action_mapsFragment_to_cardPointFragment"
+            app:destination="@id/cardPointFragment" />
     </fragment>
     <dialog
         android:id="@+id/editPointDialog"
         android:name="ru.netology.mapmarkers.ui.EditPointDialog"
-        android:label="EditPointDialog" />
+        android:label="EditPointDialog" >
+        <action
+            android:id="@+id/action_editPointDialog_to_cardPointFragment"
+            app:destination="@id/cardPointFragment" />
+        <action
+            android:id="@+id/action_editPointDialog_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+    </dialog>
+    <fragment
+        android:id="@+id/cardPointFragment"
+        android:name="ru.netology.mapmarkers.ui.CardPointFragment"
+        android:label="CardPointFragment" >
+        <action
+            android:id="@+id/action_cardPointFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_cardPointFragment_to_editPointDialog"
+            app:destination="@id/editPointDialog" />
+    </fragment>
 </navigation>

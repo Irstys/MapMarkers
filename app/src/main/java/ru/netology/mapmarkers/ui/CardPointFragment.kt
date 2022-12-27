@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
@@ -14,13 +15,14 @@ import kotlinx.coroutines.flow.collectLatest
 import ru.netology.mapmarkers.R
 import ru.netology.mapmarkers.adapter.OnInteractionListener
 import ru.netology.mapmarkers.adapter.PointsAdapter
-import ru.netology.mapmarkers.databinding.FragmentCardPointBinding
+import ru.netology.mapmarkers.databinding.PlacesFragmentBinding
 import ru.netology.mapmarkers.dto.PlacePoint
 import ru.netology.mapmarkers.viewModel.MapsViewModel
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 
+const val KEY_CAMERA_POSITION = "camera_position"
+const val KEY_CAMERA_POSITION_LATITUDE = "camera_position_latitude"
+const val KEY_CAMERA_POSITION_LONGITUDE = "camera_position_longitude"
 class CardPointFragment : Fragment() {
 
         override fun onCreateView(
@@ -28,12 +30,11 @@ class CardPointFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View {
-            val binding = FragmentCardPointBinding.inflate(
+            val binding = PlacesFragmentBinding.inflate(
                 inflater,
                 container,
                 false
             )
-            val id = arguments?.idArg
 
             val viewModel by viewModels<MapsViewModel>()
 
@@ -47,6 +48,17 @@ class CardPointFragment : Fragment() {
                         )
                     )
                 }
+
+                override fun onCameraPosition(latitude: Double, longitude: Double) {
+                    setFragmentResult(
+                       KEY_CAMERA_POSITION,
+                        bundleOf(
+                            KEY_CAMERA_POSITION_LATITUDE to latitude,
+                            KEY_CAMERA_POSITION_LONGITUDE to longitude
+                        )
+                    )
+                    findNavController().navigate(R.id.action_cardPointFragment_to_mapsFragment)         }
+
 
                 override fun onRemoveListener(place: PlacePoint) {
                     viewModel.deletePlaceById(place.id)
@@ -66,21 +78,16 @@ class CardPointFragment : Fragment() {
                     binding.empty.isVisible = places.isEmpty()
                 }
             }
+            val observe = viewModel.data.observe(viewLifecycleOwner) { places ->
+
+                val newPoint = adapter.itemCount < places.size
+                adapter.submitList(places)
+                if (newPoint) {
+                    binding.list.smoothScrollToPosition(0)
+                }
+
+            }
 
             return binding.root
         }
-
-companion object {
-    var Bundle.idArg: Int by IntArg
-}
-
-object IntArg : ReadWriteProperty<Bundle, Int> {
-    override fun getValue(thisRef: Bundle, property: KProperty<*>): Int {
-        return thisRef.getInt(property.name)
-    }
-
-    override fun setValue(thisRef: Bundle, property: KProperty<*>, value: Int) {
-        thisRef.putInt(property.name, value)
-    }
-}
 }

@@ -10,24 +10,17 @@ import ru.netology.mapmarkers.dto.PlacePointEntity
 
 @Dao
 interface PlacePointDao {
-    @Query("SELECT * FROM points ORDER BY id DESC")
+    @Query("SELECT * FROM points")
     fun getAll(): Flow<List<PlacePointEntity>>
     @Query("SELECT COUNT(*) == 0 FROM points")
-    suspend fun isEmpty(): Boolean
-    @Query("SELECT COUNT(*) FROM points")
-    suspend fun count(): Int
+    fun isEmpty(): Boolean
+    @Query("SELECT * FROM points WHERE id = :id")
+    suspend fun getMarker(id: Long): PlacePointEntity
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(point: PlacePointEntity)
+    fun insert(point: PlacePointEntity): Long
     @Query("DELETE FROM points WHERE id = :id")
     fun removeById(id: Long)
     @Query("SELECT * FROM points WHERE id = :id")
     fun getPointById(id: Long): PlacePointEntity?
-    @Query("UPDATE points SET content = :content WHERE id = :id")
-    fun updateContentById(id: Long, content: String)
-    suspend fun save(point: PlacePointEntity) {
-        if (point.id == 0L) insert(point) else point.content?.let {
-            updateContentById(point.id,
-                it)
-        }
-    }
+
 }

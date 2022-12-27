@@ -17,6 +17,7 @@ class EditPointDialog: DialogFragment() {
         private const val ID_KEY = "ID_KEY"
         private const val LAT_KEY = "LAT_KEY"
         private const val LONG_KEY = "LONG_KEY"
+
         fun newInstance(lat: Double, long: Double, id: Long? = null) = EditPointDialog().apply {
             arguments = bundleOf(LAT_KEY to lat, LONG_KEY to long, ID_KEY to id)
         }
@@ -40,7 +41,9 @@ class EditPointDialog: DialogFragment() {
                         longitude = requireArguments().getDouble(LONG_KEY),
                     )
                 )
+
             }
+
             .create()
     }
 }

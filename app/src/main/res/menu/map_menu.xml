@@ -3,7 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/list"
-        android:icon="@drawable/ic_view_list_24"
+        android:enabled="true"
+        android:icon="@drawable/ic_location_24"
         android:title="@string/to_places"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/mapFragment"
+        android:enabled="true"
+        android:icon="@drawable/ic_view_list_24"
+        android:title="@string/to_places"
+        app:showAsAction="ifRoom"/>
 </menu>

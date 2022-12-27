@@ -32,3 +32,7 @@ data class PlacePointEntity(
             )
     }
 }
+
+fun List<PlacePointEntity>.toDto() = map { it.toDto() }
+
+fun List<PlacePoint>.toEntity() = map { PlacePointEntity.fromDto(it) }

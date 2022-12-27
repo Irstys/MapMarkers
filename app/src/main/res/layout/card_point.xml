@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:ignore="ExtraText">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/thisPoint"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/commonSpacingLarge">
 
         <TextView
             android:id="@+id/name"
@@ -23,19 +17,6 @@
             app:layout_constraintTop_toTopOf="@+id/menu"
             tools:ignore="SelectableText"
             tools:text="Name" />
-
-        <ImageView
-            android:id="@+id/menu_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="6dp"
-            android:ellipsize="end"
-            android:contentDescription="@string/description_menu"
-            app:layout_constraintTop_toBottomOf="@+id/name"
-            app:srcCompat="@drawable/ic_point_24"
-            tools:layout_editor_absoluteX="@dimen/marginStart"
-            tools:ignore="MissingConstraints" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/menu"
@@ -50,20 +31,4 @@
 
         </com.google.android.material.button.MaterialButton>
 
-        <TextView
-            android:id="@+id/content"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStart"
-            android:layout_marginTop="@dimen/marginStart"
-            android:layout_marginEnd="@dimen/marginStart"
-            android:autoLink="web"
-            android:textIsSelectable="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/menu"
-            tools:text="content" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-</com.google.android.material.card.MaterialCardView>

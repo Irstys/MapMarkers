@@ -14,11 +14,7 @@ import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.layers.ObjectEvent
-import com.yandex.mapkit.map.CameraPosition
-import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.mapview.MapView
-import com.yandex.mapkit.map.Map
-import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.user_location.UserLocationLayer
 import com.yandex.mapkit.user_location.UserLocationObjectListener
 import com.yandex.mapkit.user_location.UserLocationView
@@ -29,6 +25,13 @@ import ru.netology.mapmarkers.databinding.FragmentMapsBinding
 import ru.netology.mapmarkers.databinding.PlacePointBinding
 import ru.netology.mapmarkers.viewModel.MapsViewModel
 import androidx.navigation.fragment.findNavController
+import com.yandex.mapkit.MapKit
+import com.yandex.mapkit.map.*
+import com.yandex.mapkit.map.Map
+import ru.netology.mapmarkers.util.attachToLifecycle
+import ru.netology.mapmarkers.util.drawPlacemark
+import ru.netology.mapmarkers.util.getUserLocation
+import ru.netology.mapmarkers.util.moveToLocation
 
 
 class MapsFragment  : Fragment() {
@@ -37,7 +40,12 @@ class MapsFragment  : Fragment() {
         const val LONG_KEY = "LONG_KEY"
     }
     private var mapView: MapView? = null
+    private var defaultCameraLocation = Point(59.945933, 30.320045)
     private lateinit var userLocation: UserLocationLayer
+    private lateinit var mapKit: MapKit
+    private lateinit var mapObjects: MapObjectCollection
+    private lateinit var usLocation: Point
+    private var isMoveToPoint = false
 
     private val listener = object : InputListener {
         override fun onMapTap(map: Map, point: Point) = Unit
@@ -192,7 +200,7 @@ class MapsFragment  : Fragment() {
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                 if (menuItem.itemId == R.id.list) {
-                    findNavController().navigate(R.id.action_mapsFragment_to_feedFragment)
+                    findNavController().navigate(R.id.action_mapsFragment_to_cardPointFragment)
                     true
                 } else {
                     false
@@ -200,19 +208,45 @@ class MapsFragment  : Fragment() {
 
         }, viewLifecycleOwner)
 
+        getUserLocation(defaultCameraLocation, this).observe(viewLifecycleOwner) {
+            usLocation = it
+            if (!isMoveToPoint) {
+                moveToLocation(mapView!!, usLocation)
+            }
+        }
+        binding.location.setOnClickListener {
+            moveToLocation(mapView!!, usLocation)
+        }
+        userLocation = mapKit.createUserLocationLayer(mapView!!.mapWindow).apply {
+            isVisible = true
+        }
+        viewModel.data.observe(viewLifecycleOwner) { data ->
+            if (data.isNotEmpty()) {
+                mapView!!.map.mapObjects.clear()
+                mapObjects = mapView!!.map.mapObjects.addCollection()
+                data.forEach { marker ->
+                    val point = Point(marker.latitude, marker.longitude)
+                    drawPlacemark(point, mapObjects)
+                }
+            }
+        }
+
+        mapView!!.attachToLifecycle(viewLifecycleOwner)
         return binding.root
     }
 
     override fun onStart() {
+        MapKitFactory.getInstance().onStart()
         super.onStart()
         mapView?.onStart()
-        MapKitFactory.getInstance().onStart()
+
     }
 
     override fun onStop() {
+        MapKitFactory.getInstance().onStop()
         super.onStop()
         mapView?.onStop()
-        MapKitFactory.getInstance().onStop()
+
     }
 
     override fun onDestroyView() {

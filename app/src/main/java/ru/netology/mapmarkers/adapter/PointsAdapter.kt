@@ -1,6 +1,6 @@
 package ru.netology.mapmarkers.adapter
 
-import android.view.LayoutInflater
+import  android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
@@ -12,11 +12,13 @@ import ru.netology.mapmarkers.dto.PlacePoint
 
 
 interface OnInteractionListener {
-        fun onRemoveListener(point: PlacePoint) {}
-        fun onEditListener(point: PlacePoint) {}
+        fun onRemoveListener(point: PlacePoint)
+        fun onEditListener(point: PlacePoint)
         fun onClickPoint(point: PlacePoint)
+        fun onCameraPosition(latitude: Double, longitude: Double)
     }
 
+@Suppress("DEPRECATION")
 class PointsAdapter (
         private val listener: OnInteractionListener
     ) : ListAdapter<PlacePoint, PointViewHolder>(PostDiffCallback()) {
@@ -44,6 +46,10 @@ class PointsAdapter (
                                     listener.onEditListener(point)
                                     true
                                 }
+                                R.id.navigate -> {
+                                    listener.onCameraPosition(point.latitude, point.longitude)
+                                    true
+                                }
                                 else -> false
                             }
                         }
@@ -67,8 +73,6 @@ class PointViewHolder(
         fun bind(point: PlacePoint) {
             binding.apply {
                 name.text = point.name
-                content.text = point.content
-
             }
         }
 }
